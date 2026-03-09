@@ -12,6 +12,7 @@ export const AppContextProvider = (props) => {
     const navigate = useNavigate();
     const [allCourses, setAllCourses] = useState([]) // Example state for courses, you can replace it with actual data fetching logic
     const [isEducator, setIsEducator] = useState(true)
+    const [enrolledCourses, setEnrolledCourses] = useState([])
 
     const fetchAllCourses = async () => {
         setAllCourses(dummyCourses) // Clear existing courses before fetching new ones
@@ -38,12 +39,14 @@ export const AppContextProvider = (props) => {
     }
 
     //fn to cal course duration
+    
     const calculateCourseDuration = (course) => {
-        let time = 0;
-        course.courseContent.map((chapter)=> chapter.chapterContent.map
-        ((lecture)=> time += lecture.lectureDuration))
-        return humanizeDuration(time * 60 * 1000, {units: ['h','m']})
-    }
+    const totalMinutes = course.courseContent.reduce((acc, chapter) => {
+        return acc + chapter.chapterContent.reduce((sum, lecture) => sum + lecture.lectureDuration, 0);
+    }, 0);
+    
+    return humanizeDuration(totalMinutes * 60 * 1000, { units: ['h', 'm'] });
+}
 
     //fn to cal no of lectures in a course
     
@@ -56,13 +59,20 @@ export const AppContextProvider = (props) => {
         });
         return totalLectures;
     }
+
+    //use user enrolled crses
+    const fetchUserErolledCourses = async () => {
+        setEnrolledCourses(dummyCourses)
+    }
+
     useEffect(() => {
         fetchAllCourses() // Fetch courses when the component mounts
+        fetchUserErolledCourses()
     }, [])
     const value = {
         // Add shared data here later
         currency,allCourses,navigate,calculateRating,isEducator,setIsEducator,
-        calculateChapterTime,calculateCourseDuration,calculateNoOfLectures
+        calculateChapterTime,calculateCourseDuration,calculateNoOfLectures,enrolledCourses,fetchUserErolledCourses
     };
     console.log("PROVIDING VALUE:", value);
 

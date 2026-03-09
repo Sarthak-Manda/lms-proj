@@ -4,17 +4,22 @@ import { AppContext } from '../../context/appContext'
 import Loading from '../../components/students/loading'
 import { assets } from '../../assets/assets'
 import humanizeDuration from 'humanize-duration'
+import YouTube from 'react-youtube'
 
 const CourseDetails = () => {
   const { id } = useParams()
   const [courseData, setCourseData] = useState(null)
   const [openSections, setOpenSections] = useState({}) // For accordion toggle
+   const [isAlreadyEnrolled, setIsAlreadyEnrolled] = useState(false) 
+    const [playerData, setPlayerData] = useState(null) 
 
   const { 
     allCourses, 
     calculateRating, 
     calculateChapterTime,
-    currency 
+    currency,
+    calculateCourseDuration,
+    calculateNoOfLectures
   } = useContext(AppContext) 
 
   const fetchCourseData = async () => {
@@ -101,7 +106,11 @@ const CourseDetails = () => {
                           <p className='text-sm text-gray-700'>{lecture.lectureTitle}</p>
                         </div>
                         <div className='flex items-center gap-3'>
-                          {lecture.isPreviewFree && <p className='text-blue-600 text-xs font-medium cursor-pointer'>Preview</p>}
+                          {lecture.isPreviewFree && <p onClick={()=> setPlayerData({
+                            videoId: lecture.lectureUrl.split('/').pop()
+                          })}
+                            className='text-blue-600 
+                          text-xs font-medium cursor-pointer'>Preview</p>}
                           <p className='text-xs text-gray-500'>
                             {humanizeDuration(lecture.lectureDuration * 60 * 1000, { units: ['h', 'm'], round: true })}
                           </p>
@@ -129,12 +138,21 @@ const CourseDetails = () => {
 
       {/* Right Side Column (Where the Pricing/Video Card usually goes) */}
       <div className='max-w-course-card z-10 shadow-custom-card rounded-tmd : rounded-none overflow-hidden bg-white min-w-[300px] sm:min-w-[420px]'>
-        <img src = {courseData.courseThumbnail} alt="Course Thumbnail" className='w-full h-auto rounded-md shadow-md' />
+        {
+          playerData ? 
+              <YouTube videoId = {playerData.videoId} options={{playerVars: 
+                {autoplay: 1}}} iframeClassName = 'w-full aspect-video'></YouTube>
+              :<img src = {courseData.courseThumbnail} alt="Course Thumbnail" 
+              className='w-full h-auto rounded-md shadow-md' />
+        }
+        
         <div className=' p-6'>
           <div className = 'flex items-center gap-2'>
-          <img src = {assets.time_left_clock_icon} alt = "time left clocl icon" />
+            <img className = 'w-3.5'  src = {assets.time_left_clock_icon} alt
+               = "time left clocl icon" />
+          
           <p className = 'text-red-00'> 
-            <span clasName = 'font-medium' > 4 days</span> left at this price!</p>
+            <span className = 'font-medium' > 4 days</span> left at this price!</p>
           </div>
           <div className='flex gap-3 items-center pt-2'>
 <p className='text-gray-800 md: text-4x1 text-2x1 font-semibold' >
@@ -151,6 +169,35 @@ md: pt-4 text-gray-500' >
 <img src={assets.star} alt="star icon" />
 <p>{calculateRating(courseData)}</p>
 </div>
+
+<div className = 'h-4 w-px bg-gray-500/40'></div>
+
+<div className= ' flex items-center gap-1' >
+<img src={assets.time_clock_icon} alt="clock icon" />
+<p>{calculateCourseDuration(courseData)}</p>
+</div>
+
+<div className = 'h-4 w-px bg-gray-500/40'></div> 
+
+<div className= ' flex items-center gap-1' >
+<img src={assets.lesson_icon} alt="clock icon" />
+<p>{calculateNoOfLectures(courseData)} Lessons </p>
+</div>
+</div>
+
+<button className ='md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white
+ font-medium'>{isAlreadyEnrolled ? 'already enrolled' : 'enroll now'}
+</button>
+
+<div>
+  <p className='md:text-xl text-lg font-medium'>What's In the Course</p>
+  <ul className='ml-4 pt-4 text-sm md:text-default list-disc text-gray-500'>
+    <li>Lifetime access with free updates. </li>
+    <li>Step-by-step, hands-on project guidance. </li>
+    <li>Downloadable resources and source code. </li>
+    <li>Quizzes to test your knowledge .</li>
+     <li>Certificate of completion </li>
+  </ul>
 </div>
         </div>
          {/* You can add your Course Card component here later */}
