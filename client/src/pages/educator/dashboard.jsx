@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { AppContext } from '../../context/AppContext'
+import { AppContext } from '../../context/appContext'   // ✅ curly braces, capital A
 import { dummyDashboardData, assets } from '../../assets/assets'
-import Loading from '../../components/students/Loading'
+import Loading from '../../components/students/loading'
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null)
