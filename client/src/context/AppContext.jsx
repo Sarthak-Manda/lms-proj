@@ -74,7 +74,6 @@ export const AppContextProvider = (props) => {
         currency,allCourses,navigate,calculateRating,isEducator,setIsEducator,
         calculateChapterTime,calculateCourseDuration,calculateNoOfLectures,enrolledCourses,fetchUserErolledCourses
     };
-    console.log("PROVIDING VALUE:", value);
 
     return (
         <AppContext.Provider value={value}> {/* Changed from props.value to value */}
