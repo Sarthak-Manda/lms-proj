@@ -5,11 +5,16 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import humanizeDuration from 'humanize-duration';
 export const AppContext = createContext();
+import {useAuth,useUser} from '@clerk/clerk-react'
 
 export const AppContextProvider = (props) => {
     // This is where you'll eventually put your state (e.g., const [user, setUser] = useState(null))
     const currency = import.meta.env.VITE_CURRENCY || '$'; // Accessing the currency from environment variables
     const navigate = useNavigate();
+
+    const {getToken} = useAuth()
+    const {user} = useUser()
+
     const [allCourses, setAllCourses] = useState([]) // Example state for courses, you can replace it with actual data fetching logic
     const [isEducator, setIsEducator] = useState(true)
     const [enrolledCourses, setEnrolledCourses] = useState([])
@@ -69,11 +74,23 @@ export const AppContextProvider = (props) => {
         fetchAllCourses() // Fetch courses when the component mounts
         fetchUserErolledCourses()
     }, [])
+
+       const logTOkken = async () => {
+        console.log(await getToken());
+           }
+
+    useEffect(() => {
+        if(user){
+             logTOkken()
+        }
+    },[user])   
+
     const value = {
         // Add shared data here later
         currency,allCourses,navigate,calculateRating,isEducator,setIsEducator,
         calculateChapterTime,calculateCourseDuration,calculateNoOfLectures,enrolledCourses,fetchUserErolledCourses
     };
+    console.log("PROVIDING VALUE:", value  );
 
     return (
         <AppContext.Provider value={value}> {/* Changed from props.value to value */}
